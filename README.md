@@ -78,7 +78,10 @@ export ANTHROPIC_API_KEY=sk-ant-...                 # Windows: $env:ANTHROPIC_AP
 python ask.py "How quickly must a personal data breach be reported?"
 python ask.py                                       # interactive mode
 
-# 3. Full eval: RAG answers + LLM judge
+# 3. Web UI at http://127.0.0.1:8000
+uvicorn app:app --reload
+
+# 4. Full eval: RAG answers + LLM judge
 python evaluate.py
 python evaluate.py --limit 5 --k 3                  # quicker / different k
 ```
@@ -90,6 +93,16 @@ A full run makes about 38 Claude calls (one answer and up to one judgment per qu
 | `ANTHROPIC_API_KEY` | (none) | Required for answering and judging |
 | `RAG_MODEL` | `claude-opus-5-5` | Model that answers questions |
 | `RAG_JUDGE_MODEL` | same as `RAG_MODEL` | Model that grades answers |
+
+## Deploy to Vercel
+
+The web UI is a FastAPI app ([app.py](app.py)) serving one HTML page ([web/index.html](web/index.html)). Vercel detects it with no build config.
+
+1. On [vercel.com/new](https://vercel.com/new), import this GitHub repo and keep the defaults (Framework: FastAPI).
+2. Under **Environment Variables**, add `ANTHROPIC_API_KEY`. Optionally add `RAG_MODEL` and `RATE_LIMIT_PER_MINUTE` (default 5 per IP).
+3. Deploy. Every push to `main` redeploys, and pull requests get preview URLs.
+
+A public demo spends your API credit. The app caps questions at 300 characters and rate-limits per IP, but that limiter is in memory per server instance, so also **set a monthly spend limit in the Anthropic Console**.
 
 ## Project structure
 
@@ -103,6 +116,7 @@ rag/pipeline.py     retrieve -> answer -> validate citations
 evals/              retrieval metrics + LLM judge
 evaluate.py         runs the suite, prints the report, enforces thresholds
 ask.py              CLI
+app.py, web/        FastAPI + single-page UI (deployed on Vercel)
 tests/              offline tests (LLM mocked)
 .github/workflows/  CI: offline eval on every push, full eval on main
 ```
