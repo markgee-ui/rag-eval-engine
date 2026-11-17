@@ -1,5 +1,7 @@
 # Contract RAG + Evals
 
+**Live demo: [rag-eval-engine-tau.vercel.app](https://rag-eval-engine-tau.vercel.app/)**
+
 A small question-answering tool for legal contracts, paired with an **automated evaluation pipeline** that measures **retrieval accuracy** and **hallucination rate** on every run. It's built on Claude, with ~600 lines of Python and no vector database.
 
 ![Retrieval eval report](docs/retrieval-eval.svg)
